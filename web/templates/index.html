@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css')}}">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <div id="heading">
+        <h1>Smart Nest - Pictures</h1>
+    </div>
+    <div class="gallery">
+        {% for thumbnail,name,image in images %}
+        <a href="{{ image }}" target="_blank">
+            <div class="item">
+                <img src="{{ thumbnail }}" alt="{{ name }}">
+                <div class="caption">{{ name }}</div>
+            </div>
+        </a>
+        {% else %}
+            <p>No picture available.</p>
+        {% endfor %}
+    </div>
+</body>

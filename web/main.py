@@ -1,22 +1,12 @@
 #!/usr/bin/python3
 from flask import Flask, render_template, url_for, send_from_directory
 import os
-from PIL import Image
 
 app_title = 'IOT - Smart Nest'
 app = Flask(app_title)
 extensions = {'jpg', 'jpeg'}
 picture_folder = '/home/user/smart_cities/uploads'
 thumbnail_folder = '/home/user/smart_cities/thumbnails'
-
-def create_thumbnail(image_path, thumbnail_path, size=(256, 256)):
-    filename = os.path.basename(image_path)
-    thumbnail_file = os.path.join(thumbnail_path, filename)
-    if not os.path.exists(thumbnail_file):
-        with Image.open(image_path) as image:
-            image.thumbnail(size)
-            image.save(thumbnail_file)
-    return thumbnail_file
 
 def fetch_images():
     files = []
@@ -34,7 +24,6 @@ def index():
         image_path = os.path.join(picture_folder, img)
         thumb_path = os.path.join(thumbnail_folder, img)
 
-        create_thumbnail(image_path, thumbnail_folder)
         images_data.append((
             url_for('send_thumb', filename=img),
             img,

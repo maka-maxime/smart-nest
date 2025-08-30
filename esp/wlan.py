@@ -1,24 +1,24 @@
 from machine import Pin
 import network
 import time
+import files
 
 def get_config():
     try:
-        with open('wlan.cfg','r') as file:
-            config = file.readlines()
-            ssid = None
-            key = None
-            for line in config:
-                if line.startswith('SSID='):
-                    ssid = line.strip().split('=')[1]
-                elif line.startswith('WPA2='):
-                    key = line.strip().split('=')[1]
-            if ssid and key:
-                return ssid,key
-            else:
-                raise ValueError('Unable to fetch WLAN config.')
+        ssid = None
+        key = None
+        config = files.read_config('wlan.cfg')
+        for line in config:
+            if line.startswith('SSID='):
+                ssid = line.strip().split('=')[1]
+            elif line.startswith('WPA2='):
+                key = line.strip().split('=')[1]
+        if ssid and key:
+            return ssid,key
+        else:
+            raise ValueError('Unable to fetch WLAN config.')
     except Exception as ex:
-        print('Unable to read config file: ', e)
+        print('Unable to read config file: ', ex)
         return None,None
 
 def connect(ssid, key, led):

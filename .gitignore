@@ -1,1 +1,2 @@
-esp/config.cfg
+esp/wlan.cfg
+esp/mqtt.cfg

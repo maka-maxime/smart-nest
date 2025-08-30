@@ -1,11 +1,14 @@
 #!/usr/bin/python3
+import base64
 import configparser
-from time import localtime, strftime
+from io import BytesIO
 import paho.mqtt.client as mqtt
 from PIL import Image
-from io import BytesIO
+import socket
+from time import localtime, strftime
 
 config = configparser.ConfigParser()
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def center_crop(image):
     image.convert("RGB")
@@ -32,25 +35,29 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     print('Message received')
-    prefix = config.get('MQTT', 'ImageFolder')
+    timestamp = localtime()
 
-    # generate name locally (subject to change)
-    name = strftime('%Y-%m-%d-%H%M%S.jpg', localtime())
-    image_name = prefix + '/' + name
-    thumbnail_name = prefix + '/thumb-' + name
-
-    thumbnail = create_thumbnail(msg.payload)
-
-    # currently store images locally
-    # TODO: send image and thumbnail to remote server
-    with open(image_name, 'wb') as f:
-        f.write(msg.payload)
-    with open(thumbnail_name, 'wb') as f:
-        f.write(thumbnail)    
+    image_bytes = msg.payload
+    thumbnail = create_thumbnail(image_bytes)
+    # N0 for 'Nest 0', subject to change if more than one nest
+    #   and fetch nest-id from topic
+    name = strftime('N0-%Y-%m-%d-%H%M%S.jpg', timestamp)
+    image_id = base64.b64encode(name.encode('utf-8'))
+    sock.sendall(image_id)
+    print('Image ID sent.')
+    sock.sendall(len(thumbnail).to_bytes(4, 'big'))
+    sock.sendall(thumbnail)
+    print('Thumbnail sent.')
+    sock.sendall(len(image_bytes).to_bytes(4, 'big'))
+    sock.sendall(image_bytes)
+    print('Image sent.')
 
 def main():
-
     config.read('config.ini')
+
+    stream_config = (config.get('ImageServer', 'Host'), config.getint('ImageServer','Port'))
+    sock.connect(stream_config)
+
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
@@ -64,7 +71,7 @@ def main():
     finally:
         client.loop_stop()
         client.disconnect()
-
+        sock.close()
 
 if __name__ == '__main__':
     main()

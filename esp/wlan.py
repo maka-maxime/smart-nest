@@ -28,20 +28,18 @@ def connect(ssid, key, led):
     nets = station.scan()
     try:
         if not station.isconnected():
-            station.connect(ssid, key)   
-            while not station.isconnected():
+            station.connect(ssid, key) 
+            index = 0  
+            while (not station.isconnected()) and (index < 10):
                 time.sleep(0.5)
                 led.value(led.value() ^ 0x01)
+                index = index + 1
         led.value(1)
         status = station.status()
         if status == network.STAT_GOT_IP:
             print('ipv4: %s' %station.ifconfig()[0])
+            return True
         else:
-            for i in range(0,10):
-                led.value(i & 0x01)
-                time.sleep(0.1)    
+            return False
     except OSError as e:
         print(e)
-        led.value(0)
-    finally:
-        return station

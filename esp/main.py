@@ -15,12 +15,23 @@ sensor.irq(handler=sensor_interrupt, trigger=Pin.IRQ_RISING)
 led = Pin(33, Pin.OUT)
 flash = Pin(2, Pin.OUT)
 
+# Indicate successful power-on
 led.value(0)
 time.sleep(0.5)
 led.value(1)
 
 ssid, key = wlan.get_config()
-station = wlan.connect(ssid, key, led)
+status = wlan.connect(ssid, key, led)
+if not status:
+    if status is None:
+        led.value(0)
+        while True:
+            time.sleep(10)
+    else:
+        print('Unable to connect WLAN. Abort process.')
+        while True:
+            sleep(2)
+            led.value(led.value() ^ 0x01)
 
 config = mqtt.get_config()
 broker,port,user,node,passwd,topic = config

@@ -61,6 +61,7 @@ def main():
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
+    client.username_pw_set(config.get('MQTT', 'User'), config.get('MQTT', 'Passwd'))
     client.connect(config.get('MQTT', 'Broker'), config.getint('MQTT', 'Port'))
     client.loop_start()
     try:

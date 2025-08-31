@@ -1,2 +1,3 @@
 esp/wlan.cfg
 esp/mqtt.cfg
+**/config.ini

@@ -17,6 +17,7 @@ def fetch_images():
     for filename in os.listdir(picture_folder):
         if any(filename.lower().endswith(ext) for ext in extensions):
             files.append(filename)
+    files.sort(reverse=True)
     return files
 
 @app.route('/')

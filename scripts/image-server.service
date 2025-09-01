@@ -1,0 +1,14 @@
+[Unit]
+Description=Image Tranfser Server for SmartCities-SmartNest
+After=network.target
+
+[Service]
+WorkingDirectory=/home/user/smart_cities/smart-nest/web
+ExecStart=/usr/bin/python3 -u /home/user/smart_cities/smart-nest/web/image_server.py
+Restart=always
+User=user
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

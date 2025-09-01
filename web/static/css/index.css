@@ -14,15 +14,23 @@ body {
     color: #434b5e;
 }
 
-#heading {
+.centeredBox {
     text-align: center;
 }
 
-#heading h1 {
+.centeredBox h1 {
     display: inline-block;
     font-size: 28px;
     color: #434b5e;
 }
+
+.centeredBox p {
+    display: inline-block;
+    font-size: 18px;
+    color: #434b5e;
+}
+
+.batteryLevel
 
 .gallery {
     display: flex;

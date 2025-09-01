@@ -10,6 +10,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 picture_folder = config.get('Storage', 'Images')
 thumbnail_folder = config.get('Storage', 'Thumbnails')
+battery_file = config.get('Storage', 'Battery')
 port = config.get('Network', 'WebPort')
 
 def fetch_images():
@@ -19,6 +20,10 @@ def fetch_images():
             files.append(filename)
     files.sort(reverse=True)
     return files
+
+def fetch_battery():
+    with open(battery_file, 'rt') as f:
+        return int(f.read(3))
 
 @app.route('/')
 def index():
@@ -34,7 +39,8 @@ def index():
             img,
             url_for('send_image', filename=img)
         ))
-    return render_template('index.html', title=app_title, images=images_data)
+    battery = fetch_battery()
+    return render_template('index.html', title=app_title, images=images_data, battery=battery)
 
 @app.route('/images/<path:filename>')
 def send_image(filename):

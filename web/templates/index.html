@@ -5,8 +5,11 @@
     <title>{{ title }}</title>
 </head>
 <body>
-    <div id="heading">
+    <div class="centeredBox">
         <h1>Smart Nest - Pictures</h1>
+    </div>
+    <div class="centeredBox">
+        <p>Battery level: {{battery}}%</p>
     </div>
     <div class="gallery">
         {% for thumbnail,name,image in images %}

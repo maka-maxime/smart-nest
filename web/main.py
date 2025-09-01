@@ -1,12 +1,16 @@
 #!/usr/bin/python3
 from flask import Flask, render_template, url_for, send_from_directory
 import os
+import configparser
 
 app_title = 'IOT - Smart Nest'
 app = Flask(app_title)
 extensions = {'jpg', 'jpeg'}
-picture_folder = '/home/user/smart_cities/uploads'
-thumbnail_folder = '/home/user/smart_cities/thumbnails'
+config = configparser.ConfigParser()
+config.read('config.ini')
+picture_folder = config.get('Storage', 'Images')
+thumbnail_folder = config.get('Storage', 'Thumbnails')
+port = config.get('Network', 'WebPort')
 
 def fetch_images():
     files = []
@@ -39,4 +43,4 @@ def send_image(filename):
 def send_thumb(filename):
     return send_from_directory(thumbnail_folder, filename)
 
-app.run(host='0.0.0.0', port=8080)
+app.run(host='0.0.0.0', port=port)

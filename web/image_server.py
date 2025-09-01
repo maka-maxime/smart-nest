@@ -7,8 +7,8 @@ import socket
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-host = config.get('ImageServer','Host')
-port = config.getint('ImageServer', 'Port')
+host = '0.0.0.0'
+port = config.getint('Network', 'ImagePort')
 images_folder = config.get('Storage', 'Images')
 thumbs_folder = config.get('Storage', 'Thumbnails')
 

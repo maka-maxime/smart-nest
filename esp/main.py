@@ -1,10 +1,13 @@
 from machine import Pin, deepsleep, wake_reason, PIN_WAKE
 import esp32
 from umqtt.simple import MQTTClient
+from ubinascii import b2a_base64
 import time
 import wlan
 import mqtt
 import camera
+import urandom
+import ujson
 
 sensor = Pin(2, Pin.IN)
 led = Pin(33, Pin.OUT)
@@ -38,7 +41,10 @@ if not status:
             time.sleep(0.5)
             led.value(led.value() ^ 0x01)
             deepsleep()
-
+            
+urandom.seed(time.localtime()[5])
+battery = urandom.randint(1,100)
+print('battery %d' %battery)
 config = mqtt.get_config()
 broker,port,user,node,passwd,topic = config
 client = MQTTClient(node, broker, user=user, password=passwd, port=port, ssl=False)
@@ -52,7 +58,11 @@ try:
     image = camera.capture()
     flash.value(0)
     camera.deinit()
-    client.publish(topic, image)
+    image_b64 = b2a_base64(image)
+    str = ujson.dumps({
+        'battery': battery,
+        'image': image_b64})
+    client.publish(topic, str)
     time.sleep(1)
 except Exception as e:
     led.value(0)
@@ -61,3 +71,4 @@ finally:
     while sensor.value() == 1:
         time.sleep(1)
     deepsleep()
+

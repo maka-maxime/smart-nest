@@ -6,6 +6,7 @@ import paho.mqtt.client as mqtt
 from PIL import Image
 import socket
 from time import localtime, strftime
+import json
 
 config = configparser.ConfigParser()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -37,10 +38,16 @@ def on_message(client, userdata, msg):
     print('Message received')
     timestamp = localtime()
 
-    image_bytes = msg.payload
+    data_json = json.loads(msg.payload)
+    image_bytes = base64.b64decode(data_json['image'])
+    battery = data_json['battery']
+    print(f'battery: {battery}')
     thumbnail = create_thumbnail(image_bytes)
     # N0 for 'Nest 0', subject to change if more than one nest
     #   and fetch nest-id from topic
+    battery_bytes = base64.b64encode(f'{battery:03}'.encode('utf-8'))
+    print(battery_bytes)
+    sock.sendall(battery_bytes)
     name = strftime('N0-%Y-%m-%d-%H%M%S.jpg', timestamp)
     image_id = base64.b64encode(name.encode('utf-8'))
     sock.sendall(image_id)

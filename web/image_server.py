@@ -4,6 +4,7 @@ import configparser
 from io import BytesIO
 from PIL import Image
 import socket
+import json
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -11,6 +12,7 @@ host = '0.0.0.0'
 port = config.getint('Network', 'ImagePort')
 images_folder = config.get('Storage', 'Images')
 thumbs_folder = config.get('Storage', 'Thumbnails')
+battery_file = config.get('Storage', 'Battery')
 
 listening_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 listening_sock.bind((host, port))
@@ -26,6 +28,16 @@ try:
         while True:
             try:
                 print('Waiting for data...')
+                battery_b64 = service_sock.recv(4)
+                print(battery_b64)
+                if len(battery_b64) < 4:
+                    print('Peer disconnected.')
+                    break
+                battery = base64.b64decode(battery_b64).decode('utf-8')
+                print(f'battery {battery}')
+                with open(battery_file, 'w') as f:
+                    f.write(battery)
+
                 image_id64 = service_sock.recv(32)
                 if len(image_id64) < 32:
                     print('Peer disconnected.')
